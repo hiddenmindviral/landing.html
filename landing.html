@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AvocaIA — L'IA au service des avocats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a2e; --parchment: #f5f0e8; --gold: #c9a84c;
+      --goldLight: #e8d5a0; --crimson: #8b1a1a; --mist: #e8e4dc;
+      --white: #ffffff; --gray: #666;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--parchment); color: var(--ink); overflow-x: hidden; }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1rem 2.5rem; background: rgba(26,26,46,0.97); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(201,168,76,0.2); }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--white); }
+    .nav-logo span { color: var(--gold); }
+    .nav-cta { background: var(--gold); color: var(--ink); border: none; cursor: pointer; padding: 0.6rem 1.4rem; border-radius: 2px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; transition: opacity 0.2s; text-decoration: none; }
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* URGENCY BAR */
+    .urgency-bar { background: var(--gold); padding: 0.55rem 2rem; text-align: center; margin-top: 60px; }
+    .urgency-bar p { font-size: 0.82rem; color: var(--ink); font-weight: 600; }
+    .urgency-bar a { color: var(--ink); text-decoration: underline; }
+
+    /* HERO — tout visible sans scroller */
+    .hero { background: var(--ink); min-height: calc(100vh - 96px); display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 2rem 4rem; gap: 3rem; }
+    .hero-left { display: flex; flex-direction: column; gap: 1.5rem; }
+    .hero-eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 900; line-height: 1.08; color: var(--white); }
+    .hero-title em { font-style: italic; color: var(--crimson); }
+    .hero-sub { font-size: 1rem; line-height: 1.7; color: rgba(255,255,255,0.65); max-width: 420px; }
+    .hero-cta-group { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .btn-hero-primary { background: var(--gold); color: var(--ink); padding: 1rem 2rem; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700; border-radius: 2px; text-decoration: none; display: inline-block; transition: opacity 0.2s; }
+    .btn-hero-primary:hover { opacity: 0.88; }
+    .btn-hero-secondary { color: rgba(255,255,255,0.6); font-size: 0.88rem; text-decoration: none; border-bottom: 1px solid rgba(201,168,76,0.4); padding-bottom: 2px; }
+    .hero-trust { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+    .trust-item { font-size: 0.78rem; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 0.4rem; }
+    .trust-item::before { content: '✓'; color: var(--gold); font-weight: 700; }
+
+    /* DEMO GIF SIDE */
+    .hero-right { position: relative; }
+    .demo-window { background: var(--white); border-radius: 8px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+    .demo-bar { background: #2d2d2d; padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .demo-url { background: #444; border-radius: 4px; padding: 0.2rem 0.75rem; font-size: 0.72rem; color: #aaa; margin-left: 0.5rem; }
+    .demo-content { padding: 1.5rem; background: var(--parchment); }
+    .demo-nav { display: flex; gap: 0.5rem; margin-bottom: 1rem; background: var(--ink); padding: 0.5rem 0.75rem; border-radius: 4px; }
+    .demo-nav-item { font-size: 0.72rem; color: rgba(255,255,255,0.5); padding: 0.25rem 0.6rem; border-radius: 2px; }
+    .demo-nav-item.active { background: rgba(201,168,76,0.15); color: var(--gold); font-weight: 600; }
+    .demo-typing { background: var(--white); border: 1px solid var(--mist); border-radius: 4px; padding: 1rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--gray); font-style: italic; line-height: 1.5; }
+    .demo-typing span { color: var(--ink); font-style: normal; font-weight: 500; }
+    .demo-result { background: var(--ink); border-radius: 4px; padding: 1rem; font-size: 0.78rem; color: rgba(255,255,255,0.8); line-height: 1.6; }
+    .demo-result-header { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+    .demo-timer { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; font-size: 0.72rem; color: var(--gold); font-weight: 600; }
+
+    /* TEMOIGNAGES */
+    .testimonials { background: var(--white); padding: 4rem 4rem; }
+    .section-eyebrow { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 0.75rem; text-align: center; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 900; color: var(--ink); text-align: center; margin-bottom: 2.5rem; line-height: 1.2; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .testimonial-card { background: var(--parchment); border: 1px solid var(--mist); border-radius: 4px; padding: 1.5rem; position: relative; }
+    .testimonial-card::before { content: '"'; font-family: 'Playfair Display', serif; font-size: 4rem; color: var(--gold); opacity: 0.3; position: absolute; top: -0.5rem; left: 1rem; line-height: 1; }
+    .testimonial-text { font-size: 0.9rem; line-height: 1.7; color: #444; margin-bottom: 1rem; padding-top: 1rem; }
+    .testimonial-author { display: flex; align-items: center; gap: 0.75rem; }
+    .testimonial-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+    .testimonial-name { font-size: 0.82rem; font-weight: 600; color: var(--ink); }
+    .testimonial-role { font-size: 0.72rem; color: var(--gray); }
+    .testimonial-stars { color: var(--gold); font-size: 0.8rem; margin-bottom: 0.5rem; }
+
+    /* FORMULAIRE BÊTA */
+    .beta-section { background: var(--ink); padding: 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    .beta-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 900; line-height: 1.15; color: var(--white); margin-bottom: 1rem; }
+    .beta-title em { color: var(--gold); font-style: italic; }
+    .beta-desc { font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; }
+    .beta-perks { list-style: none; }
+    .beta-perks li { font-size: 0.88rem; color: rgba(255,255,255,0.7); padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); padding-left: 1.2rem; position: relative; }
+    .beta-perks li::before { content: '§'; position: absolute; left: 0; color: var(--gold); font-size: 0.75rem; }
+    .form-card { background: var(--white); border: 1px solid var(--goldLight); padding: 2rem; border-radius: 4px; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .form-subtitle { font-size: 0.82rem; color: var(--gray); margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #666; margin-bottom: 0.4rem; }
+    .form-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--mist); border-radius: 2px; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: var(--ink); background: var(--parchment); outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: var(--gold); background: var(--white); }
+    .form-select { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--mist); border-radius: 2px; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: var(--ink); background: var(--parchment); outline: none; appearance: none; cursor: pointer; }
+    .btn-submit { width: 100%; background: var(--gold); color: var(--ink); border: none; cursor: pointer; padding: 1rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 700; border-radius: 2px; transition: opacity 0.2s; margin-top: 0.5rem; }
+    .btn-submit:hover { opacity: 0.88; }
+    .form-note { font-size: 0.72rem; color: #aaa; text-align: center; margin-top: 0.75rem; }
+    .places-left { font-size: 0.75rem; color: var(--gold); text-align: center; margin-top: 0.5rem; font-weight: 600; }
+    .success-msg { display: none; text-align: center; padding: 2rem; }
+
+    /* MODULES */
+    .modules-section { padding: 4rem; background: var(--parchment); }
+    .modules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5px; background: var(--goldLight); border: 1.5px solid var(--goldLight); margin-top: 2rem; }
+    .module-card { background: var(--parchment); padding: 2rem; transition: background 0.2s; }
+    .module-card:hover { background: var(--white); }
+    .module-icon { font-size: 1.8rem; margin-bottom: 1rem; display: block; }
+    .module-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem; }
+    .module-desc { font-size: 0.88rem; line-height: 1.65; color: var(--gray); margin-bottom: 1rem; }
+    .module-features { list-style: none; }
+    .module-features li { font-size: 0.8rem; color: #555; padding: 0.25rem 0; padding-left: 1rem; position: relative; }
+    .module-features li::before { content: '—'; position: absolute; left: 0; color: var(--gold); font-weight: 700; }
+
+    /* STATS BAR */
+    .stats-bar { background: var(--ink); display: flex; justify-content: center; }
+    .stat-item { flex: 1; max-width: 240px; padding: 2rem 1.5rem; text-align: center; border-right: 1px solid rgba(255,255,255,0.08); }
+    .stat-item:last-child { border-right: none; }
+    .stat-number { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; color: var(--gold); display: block; }
+    .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.25rem; }
+
+    /* PRICING */
+    .pricing-section { background: var(--ink); padding: 4rem; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem; }
+    .pricing-card { border: 1px solid rgba(201,168,76,0.2); padding: 2rem; border-radius: 2px; position: relative; transition: border-color 0.2s; }
+    .pricing-card:hover { border-color: var(--gold); }
+    .pricing-card.featured { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+    .pricing-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--ink); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 1rem; border-radius: 20px; }
+    .pricing-plan { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .pricing-price { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900; color: var(--white); line-height: 1; }
+    .pricing-period { font-size: 0.82rem; color: rgba(255,255,255,0.4); margin-left: 0.25rem; }
+    .pricing-desc { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin: 0.75rem 0 1.2rem; }
+    .pricing-features { list-style: none; margin-bottom: 1.5rem; }
+    .pricing-features li { font-size: 0.82rem; color: rgba(255,255,255,0.7); padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 0.6rem; }
+    .pricing-features li::before { content: '✓'; color: var(--gold); font-weight: 700; }
+    .btn-outline { display: block; width: 100%; border: 1px solid rgba(201,168,76,0.4); color: var(--white); background: transparent; padding: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; border-radius: 2px; text-align: center; transition: all 0.2s; text-decoration: none; }
+    .btn-outline:hover, .pricing-card.featured .btn-outline { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+
+    /* FOOTER */
+    footer { background: var(--ink); border-top: 1px solid rgba(201,168,76,0.15); padding: 1.5rem 2.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 900; color: var(--white); }
+    .footer-logo span { color: var(--gold); }
+    .footer-text { font-size: 0.72rem; color: rgba(255,255,255,0.3); }
+    .footer-text a { color: rgba(255,255,255,0.3); text-decoration: none; }
+
+    /* ANIMATIONS */
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .cursor { display: inline-block; width: 2px; height: 1em; background: var(--gold); animation: blink 1s infinite; vertical-align: text-bottom; margin-left: 2px; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero, .beta-section { grid-template-columns: 1fr; padding: 2rem 1.5rem; }
+      .hero-right { display: none; }
+      .modules-grid, .pricing-grid, .testimonials-grid { grid-template-columns: 1fr; }
+      .testimonials, .modules-section, .pricing-section { padding: 3rem 1.5rem; }
+      .stats-bar { flex-wrap: wrap; }
+      .stat-item { min-width: 50%; }
+      nav { padding: 1rem 1.5rem; }
+      footer { flex-direction: column; gap: 0.75rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Avoca<span>IA</span></div>
+  <a href="#beta" class="nav-cta" onclick="document.getElementById('beta').scrollIntoView({behavior:'smooth'}); return false;">Accès bêta gratuit</a>
+</nav>
+
+<!-- BARRE URGENCE -->
+<div class="urgency-bar">
+  <p>⚡ Accès bêta limité à 50 avocats ce mois-ci · <a href="#beta" onclick="document.getElementById('beta').scrollIntoView({behavior:'smooth'}); return false;">Je réserve ma place →</a></p>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">Conçu pour les avocats</p>
+    <h1 class="hero-title">Votre cabinet.<br><em>Augmenté</em><br>par l'IA.</h1>
+    <p class="hero-sub">AvocaIA réunit rédaction, veille juridique, gestion client et contenu LinkedIn dans un seul outil pensé pour les avocats solos et petits cabinets.</p>
+    <div class="hero-cta-group">
+      <a href="#beta" class="btn-hero-primary" onclick="document.getElementById('beta').scrollIntoView({behavior:'smooth'}); return false;">Essayer gratuitement 30 jours →</a>
+      <a href="#modules" class="btn-hero-secondary" onclick="document.getElementById('modules').scrollIntoView({behavior:'smooth'}); return false;">Voir les modules</a>
+    </div>
+    <div class="hero-trust">
+      <span class="trust-item">30 jours gratuits</span>
+      <span class="trust-item">Sans carte bancaire</span>
+      <span class="trust-item">Sans engagement</span>
+    </div>
+  </div>
+
+  <!-- DEMO ANIMÉE -->
+  <div class="hero-right">
+    <div class="demo-window">
+      <div class="demo-bar">
+        <div class="demo-dot" style="background:#ff5f57"></div>
+        <div class="demo-dot" style="background:#febc2e"></div>
+        <div class="demo-dot" style="background:#28c840"></div>
+        <div class="demo-url">app.avocaia.eu</div>
+      </div>
+      <div class="demo-content">
+        <div class="demo-nav">
+          <span class="demo-nav-item active">✍️ Rédaction</span>
+          <span class="demo-nav-item">📡 Veille</span>
+          <span class="demo-nav-item">📝 LinkedIn</span>
+          <span class="demo-nav-item">👥 CRM</span>
+        </div>
+        <div class="demo-typing" id="demo-typing">
+          <span id="demo-text"></span><span class="cursor"></span>
+        </div>
+        <div class="demo-result" id="demo-result" style="display:none">
+          <div class="demo-result-header">✅ Document généré</div>
+          <div id="demo-result-text" style="font-size:0.75rem;line-height:1.6"></div>
+          <div class="demo-timer">⚡ Généré en 4 secondes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEMOIGNAGES -->
+<section class="testimonials">
+  <p class="section-eyebrow">Ce qu'ils en disent</p>
+  <h2 class="section-title">Les premiers avocats ont testé.<br>Voici leurs retours.</h2>
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">En 10 secondes j'avais une mise en demeure parfaitement rédigée. J'ai gagné 30 minutes sur un dossier urgent. L'outil est bluffant pour la rédaction.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">DT</div>
+        <div>
+          <div class="testimonial-name">Maître De Tassigny</div>
+          <div class="testimonial-role">Avocate — Droit de la famille, Paris</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">La veille juridique m'économise facilement 2h par semaine. Je reçois chaque matin un résumé des décisions dans mon domaine. Indispensable.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">DC</div>
+        <div>
+          <div class="testimonial-name">Maître Ducleux</div>
+          <div class="testimonial-role">Avocat — Droit social, Lyon</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">J'ai récupéré 4 500€ d'honoraires impayés en une semaine grâce aux relances automatiques. Le CRM m'a payé son abonnement en 48h.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">EA</div>
+        <div>
+          <div class="testimonial-name">Maître El Atmani</div>
+          <div class="testimonial-role">Avocat — Droit des affaires, Bordeaux</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMULAIRE BÊTA -->
+<section class="beta-section" id="beta">
+  <div>
+    <p class="hero-eyebrow" style="color:var(--gold)">Accès bêta</p>
+    <h2 class="beta-title">30 jours<br><em>offerts.</em><br>Sans engagement.</h2>
+    <p class="beta-desc">AvocaIA est en phase bêta. Nous ouvrons l'accès à 50 avocats ce mois-ci. Votre retour façonne le produit final.</p>
+    <ul class="beta-perks">
+      <li>Accès complet aux 4 modules pendant 30 jours</li>
+      <li>Tarif bêta fondateur à -50% à vie</li>
+      <li>Votre retour façonne le produit</li>
+      <li>Aucune carte bancaire requise</li>
+    </ul>
+  </div>
+  <div>
+    <div class="form-card">
+      <h3 class="form-title">Rejoindre la bêta</h3>
+      <p class="form-subtitle">⏳ Places limitées — réponse sous 24h</p>
+      <div id="formContent">
+        <div class="form-group">
+          <label class="form-label" for="name">Prénom et nom</label>
+          <input class="form-input" type="text" id="name" placeholder="Maître Dupont" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email professionnel</label>
+          <input class="form-input" type="email" id="email" placeholder="contact@cabinet-dupont.fr" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="specialite">Spécialité principale</label>
+          <select class="form-select" id="specialite">
+            <option value="">Sélectionner...</option>
+            <option>Droit des affaires</option>
+            <option>Droit de la famille</option>
+            <option>Droit pénal</option>
+            <option>Droit social</option>
+            <option>Droit immobilier</option>
+            <option>Droit fiscal</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <button class="btn-submit" onclick="handleSubmit()">Je réserve ma place gratuite →</button>
+        <p class="places-left">⚡ Places limitées à 50 avocats ce mois-ci</p>
+        <p class="form-note">🔒 Vos données ne sont jamais revendues ni partagées.</p>
+      </div>
+      <div class="success-msg" id="successMsg">
+        <div style="font-size:2.5rem;margin-bottom:1rem">⚖️</div>
+        <p style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:0.5rem">Bienvenue dans la bêta !</p>
+        <p style="font-size:0.88rem;color:#666">Vous recevrez votre accès dans les 24 heures.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULES -->
+<section class="modules-section" id="modules">
+  <p class="section-eyebrow">Ce que AvocaIA fait pour vous</p>
+  <h2 class="section-title">Quatre modules,<br>un seul outil.</h2>
+  <div class="modules-grid">
+    <div class="module-card">
+      <span class="module-icon">✍️</span>
+      <h3 class="module-title">Rédaction assistée</h3>
+      <p class="module-desc">Générez en quelques secondes courriers, mises en demeure, conclusions et contrats. L'IA connaît les formules juridiques françaises.</p>
+      <ul class="module-features">
+        <li>Courriers et mises en demeure</li>
+        <li>Conclusions et mémoires</li>
+        <li>Contrats types personnalisables</li>
+        <li>Relecture et correction automatique</li>
+      </ul>
+    </div>
+    <div class="module-card">
+      <span class="module-icon">📡</span>
+      <h3 class="module-title">Veille juridique</h3>
+      <p class="module-desc">Restez à jour sans effort. AvocaIA surveille la jurisprudence et les nouvelles lois dans vos domaines de spécialité.</p>
+      <ul class="module-features">
+        <li>Suivi jurisprudence Cour de cassation</li>
+        <li>Alertes lois et décrets ciblés</li>
+        <li>Résumés quotidiens lisibles</li>
+        <li>Classement par domaine</li>
+      </ul>
+    </div>
+    <div class="module-card">
+      <span class="module-icon">📝</span>
+      <h3 class="module-title">Contenu LinkedIn</h3>
+      <p class="module-desc">Développez votre réputation en ligne sans y passer des heures. Posts, articles, planning éditorial générés en 1 clic.</p>
+      <ul class="module-features">
+        <li>Posts LinkedIn hebdomadaires</li>
+        <li>Articles de blog SEO</li>
+        <li>Bio et présentation cabinet</li>
+        <li>Calendrier éditorial automatique</li>
+      </ul>
+    </div>
+    <div class="module-card">
+      <span class="module-icon">👥</span>
+      <h3 class="module-title">CRM clients</h3>
+      <p class="module-desc">Suivez vos dossiers, relancez vos clients et gérez vos honoraires. Les relances sont rédigées par l'IA, vous n'avez qu'à valider.</p>
+      <ul class="module-features">
+        <li>Suivi dossiers et échéances</li>
+        <li>Relances automatiques rédigées</li>
+        <li>Historique client centralisé</li>
+        <li>Rappels d'honoraires impayés</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item"><span class="stat-number">3h</span><span class="stat-label">économisées / jour</span></div>
+  <div class="stat-item"><span class="stat-number">4</span><span class="stat-label">modules intégrés</span></div>
+  <div class="stat-item"><span class="stat-number">8 sec</span><span class="stat-label">une mise en demeure</span></div>
+  <div class="stat-item"><span class="stat-number">0€</span><span class="stat-label">pour commencer</span></div>
+</div>
+
+<!-- PRICING -->
+<section class="pricing-section">
+  <p class="section-eyebrow" style="color:var(--gold);text-align:center">Tarifs simples</p>
+  <h2 class="section-title" style="color:var(--white)">Choisissez votre formule.</h2>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <p class="pricing-plan">Starter</p>
+      <p class="pricing-price">49<span class="pricing-period">€/mois</span></p>
+      <p class="pricing-desc">Pour démarrer avec l'IA dans votre pratique quotidienne.</p>
+      <ul class="pricing-features">
+        <li>Module Rédaction assistée</li>
+        <li>Module Contenu LinkedIn</li>
+        <li>50 documents / mois</li>
+        <li>Support email</li>
+      </ul>
+      <a href="https://buy.stripe.com/test_bJe4gB1jo5PT0C5b1BgEg00" target="_blank" class="btn-outline">Commencer</a>
+    </div>
+    <div class="pricing-card featured">
+      <span class="pricing-badge">Le plus choisi</span>
+      <p class="pricing-plan">Pro</p>
+      <p class="pricing-price">99<span class="pricing-period">€/mois</span></p>
+      <p class="pricing-desc">La suite complète pour un avocat solo ou associé actif.</p>
+      <ul class="pricing-features">
+        <li>Rédaction + Contenu LinkedIn</li>
+        <li>Veille juridique personnalisée</li>
+        <li>Documents illimités</li>
+        <li>Support prioritaire</li>
+      </ul>
+      <a href="https://buy.stripe.com/test_fZu28t9PUemp1G90mXgEg01" target="_blank" class="btn-outline">Commencer</a>
+    </div>
+    <div class="pricing-card">
+      <p class="pricing-plan">Cabinet</p>
+      <p class="pricing-price">199<span class="pricing-period">€/mois</span></p>
+      <p class="pricing-desc">Pour les cabinets avec plusieurs associés ou collaborateurs.</p>
+      <ul class="pricing-features">
+        <li>Les 4 modules complets</li>
+        <li>Jusqu'à 5 utilisateurs</li>
+        <li>CRM multi-dossiers</li>
+        <li>Onboarding dédié</li>
+      </ul>
+      <a href="https://buy.stripe.com/test_bJe8wRe6a4LPesV6LlgEg02" target="_blank" class="btn-outline">Commencer</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Avoca<span>IA</span></div>
+  <p class="footer-text">© 2026 AvocaIA · contact@avocaia.eu · <a href="/legal">Mentions légales & CGV</a></p>
+</footer>
+
+<script>
+// ── DÉMO ANIMÉE ──────────────────────────────────
+const demos = [
+  {
+    prompt: "Rédige une mise en demeure pour impayé de 8 500 € à l'encontre de M. Dupont...",
+    result: "Monsieur,\n\nPar la présente mise en demeure, nous vous enjoignons de procéder au règlement de la somme de 8 500 € dans un délai de 8 jours à compter de la réception du présent courrier...\n\nÀ défaut, nous nous verrons contraints d'engager toute procédure judiciaire utile."
+  },
+  {
+    prompt: "Génère un post LinkedIn sur la jurisprudence récente en droit social...",
+    result: "⚖️ La Cour de cassation vient de rendre une décision majeure.\n\nUn salarié ne peut être licencié pour inaptitude sans que l'employeur ait recherché un reclassement...\n\nCe que ça change pour vos dossiers en cours :\n\n→ Vérifiez chaque procédure\n→ Documentez les recherches\n→ Anticipez les contentieux\n\n#DroitSocial #AvocatEntreprise"
+  },
+  {
+    prompt: "Relance honoraires impayés pour M. Bernard — 3 200 € — 2ème relance...",
+    result: "Objet : Relance honoraires — Réf. dossier 2026-089\n\nCher Monsieur Bernard,\n\nSauf erreur de notre part, la facture n°2026-089 d'un montant de 3 200 € demeure impayée à ce jour.\n\nNous vous prions de bien vouloir régulariser cette situation sous 8 jours..."
+  }
+];
+
+let demoIndex = 0;
+let charIndex = 0;
+let typing = true;
+let waitTimer = null;
+
+function typeDemo() {
+  const demo = demos[demoIndex];
+  const typingEl = document.getElementById('demo-text');
+  const resultEl = document.getElementById('demo-result');
+  const resultTextEl = document.getElementById('demo-result-text');
+
+  if (typing) {
+    if (charIndex < demo.prompt.length) {
+      typingEl.textContent = demo.prompt.slice(0, charIndex + 1);
+      charIndex++;
+      setTimeout(typeDemo, 35);
+    } else {
+      setTimeout(() => {
+        resultEl.style.display = 'block';
+        resultTextEl.textContent = demo.result;
+        typing = false;
+        setTimeout(() => {
+          resultEl.style.display = 'none';
+          typingEl.textContent = '';
+          charIndex = 0;
+          typing = true;
+          demoIndex = (demoIndex + 1) % demos.length;
+          typeDemo();
+        }, 4000);
+      }, 800);
+    }
+  }
+}
+
+window.addEventListener('load', () => setTimeout(typeDemo, 1000));
+
+// ── FORMULAIRE ───────────────────────────────────
+async function handleSubmit() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const specialite = document.getElementById('specialite').value;
+  if (!name || !email || !specialite) { alert('Merci de remplir tous les champs.'); return; }
+  const btn = document.querySelector('.btn-submit');
+  btn.textContent = 'Envoi en cours...'; btn.disabled = true;
+  try {
+    const res = await fetch('https://formspree.io/f/mojzlyvr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ nom: name, email, specialite })
+    });
+    if (res.ok) {
+      document.getElementById('formContent').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    } else {
+      alert('Une erreur est survenue. Réessayez.');
+      btn.textContent = 'Je réserve ma place gratuite →'; btn.disabled = false;
+    }
+  } catch {
+    alert('Erreur de connexion.');
+    btn.textContent = 'Je réserve ma place gratuite →'; btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
